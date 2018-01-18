@@ -11,7 +11,7 @@
             [clojured-monster.game :refer [create-game compute-changes]])
   (:gen-class))
 
-(def token (apply str (drop-last (slurp "../clojured_monster.settings"))))
+(def token (apply str (drop-last (slurp "clojured_monster.token"))))
 
 (def settings (read-string (slurp "settings.clj")))
 

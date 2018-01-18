@@ -11,3 +11,4 @@
 .lein-plugins/
 .lein-failures
 .nrepl-port
+clojured_monster.token
