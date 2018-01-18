@@ -1,15 +1,23 @@
 (ns clojured-monster.core
   (:require [clojure.core.async :refer [<!!]]
+            [clojure.tools.trace :refer [trace-forms trace]]
             [clojure.string :as str]
             [environ.core :refer [env]]
             [morse.handlers :as h]
             [morse.polling :as p]
-            [morse.api :as t])
+            [morse.api :as t]
+            [clojure.string :refer [lower-case]]
+            [clojure.set :refer [difference]]
+            [clojured-monster.game :refer [create-game compute-changes]])
   (:gen-class))
 
-; TODO: fill correct token
-(def token (env :telegram-token))
+(def token (apply str (drop-last (slurp "../clojured_monster.settings"))))
 
+(def settings (read-string (slurp "settings.clj")))
+
+(def state (atom {}))
+
+(def game-states (atom {}))
 
 (h/defhandler handler
 
@@ -26,13 +34,29 @@
   (h/message-fn
     (fn [{{id :id} :chat :as message}]
       (println "Intercepted message: " message)
-      (t/send-text token id "I don't do a whole lot ... yet."))))
+      (case (lower-case (:text message))
+        "play" (do 
+                   (swap! state assoc :queue (conj (or (:queue @state) #{}) id))
+                   (if (>= (count (:queue @state)) (:players-number settings))
+                     (let [old-state @state 
+                           new-state (assoc 
+                                       @state 
+                                       :queue 
+                                       (drop (:players-number settings) (:queue @state)))
+                           diff (difference (:queue old-state) (:queue new-state))] 
+                       (if (compare-and-set! state old-state new-state)
+                         (let [text (create-game diff game-states)]
+                           (doall (for [player (seq diff)] (t/send-text token player text))))))
+                     (t/send-text token id "Waiting for other players...")))
+        (t/send-text token id "It's not a command. Please see help for the list of available commands."))
+      (println @game-states)
+      )))
 
 
 (defn -main
   [& args]
   (when (str/blank? token)
-    (println "Please provde token in TELEGRAM_TOKEN environment variable!")
+    (println "Please provide token in TELEGRAM_TOKEN environment variable!")
     (System/exit 1))
 
   (println "Starting the clojured-monster")
