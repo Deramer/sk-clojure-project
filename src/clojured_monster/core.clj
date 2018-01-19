@@ -16,6 +16,8 @@
 
 (def settings (read-string (slurp "resources/settings.clj")))
 
+(def texts (read-string (slurp "resources/english_text.clj")))
+
 (def state (atom {}))
 
 (def id-to-game-info (atom {}))
@@ -29,19 +31,19 @@
         (swap! id-to-game-info #(apply (partial dissoc %1) %2) players))
       (doall (for [player players]
                (t/send-text token player (:text response)))))
-    (t/send-text token id "You are not in a game.")))
+    (t/send-text token id (:error-out-of-game texts))))
 
 (h/defhandler handler
 
   (h/command-fn "start"
     (fn [{{id :id :as chat} :chat}]
       (println "Bot joined new chat: " chat)
-      (t/send-text token id "Welcome to clojured-monster!")))
+      (t/send-text token id (:start texts))))
 
   (h/command-fn "help"
     (fn [{{id :id :as chat} :chat}]
       (println "Help was requested in " chat)
-      (t/send-text token id "Help is on the way")))
+      (t/send-text token id (:help texts))))
 
   (h/message-fn
     (fn [{{id :id} :chat :as message}]
@@ -64,14 +66,14 @@
                                     (do 
                                       (t/send-text token player text)
                                       (swap! id-to-game-info assoc player game-info)))))))
-                     (t/send-text token id "Waiting for other players...")))
-                 (t/send-text token id "You are already in the game."))
+                     (t/send-text token id (:stand-by texts))))
+                 (t/send-text token id (:error-in-game texts)))
         "hit" (compute-changes-wrap id :hit)
         "scold" (compute-changes-wrap id :scold)
         "pat" (compute-changes-wrap id :pat)
         "feed" (compute-changes-wrap id :feed)
         "tame" (compute-changes-wrap id :tame)
-        :else (t/send-text token id "It's not a command. Please see help for the list of available commands."))
+        :else (t/send-text token id (:error texts)))
       )))
 
 
