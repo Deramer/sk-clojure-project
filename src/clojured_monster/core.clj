@@ -1,5 +1,6 @@
 (ns clojured-monster.core
   (:require [clojure.core.async :refer [<!!]]
+            [clojure.core.match :refer [match]]
             [clojure.tools.trace :refer [trace-forms trace]]
             [clojure.string :as str]
             [environ.core :refer [env]]
@@ -13,11 +14,22 @@
 
 (def token (apply str (drop-last (slurp "clojured_monster.token"))))
 
-(def settings (read-string (slurp "settings.clj")))
+(def settings (read-string (slurp "resources/settings.clj")))
 
 (def state (atom {}))
 
-(def game-states (atom {}))
+(def id-to-game-info (atom {}))
+
+
+(defn compute-changes-wrap [id action]
+  (if (contains? @id-to-game-info id)
+    (let [response (compute-changes id action (first (get @id-to-game-info id))) 
+          players (second (get @id-to-game-info id))]
+      (if (:game-over response)
+        (swap! id-to-game-info #(apply (partial dissoc %1) %2) players))
+      (doall (for [player players]
+               (t/send-text token player (:text response)))))
+    (t/send-text token id "You are not in a game.")))
 
 (h/defhandler handler
 
@@ -34,8 +46,9 @@
   (h/message-fn
     (fn [{{id :id} :chat :as message}]
       (println "Intercepted message: " message)
-      (case (lower-case (:text message))
-        "play" (do 
+      (match (lower-case (:text message))
+        "play" (if (not (contains? @id-to-game-info id))
+                 (do 
                    (swap! state assoc :queue (conj (or (:queue @state) #{}) id))
                    (if (>= (count (:queue @state)) (:players-number settings))
                      (let [old-state @state 
@@ -43,13 +56,22 @@
                                        old-state 
                                        :queue 
                                        (drop (:players-number settings) (:queue old-state)))
-                           diff (difference (:queue old-state) (:queue new-state))] 
+                           diff (difference (:queue old-state) (:queue new-state))
+                           game-info [(apply min diff) diff]] 
                        (if (compare-and-set! state old-state new-state)
-                         (let [text (create-game diff game-states)]
-                           (doall (for [player (seq diff)] (t/send-text token player text))))))
+                         (let [text (create-game diff)]
+                           (doall (for [player (seq diff)] 
+                                    (do 
+                                      (t/send-text token player text)
+                                      (swap! id-to-game-info assoc player game-info)))))))
                      (t/send-text token id "Waiting for other players...")))
-        (t/send-text token id "It's not a command. Please see help for the list of available commands."))
-      (println @game-states)
+                 (t/send-text token id "You are already in the game."))
+        "hit" (compute-changes-wrap id :hit)
+        "scold" (compute-changes-wrap id :scold)
+        "pat" (compute-changes-wrap id :pat)
+        "feed" (compute-changes-wrap id :feed)
+        "tame" (compute-changes-wrap id :tame)
+        :else (t/send-text token id "It's not a command. Please see help for the list of available commands."))
       )))
 
 
