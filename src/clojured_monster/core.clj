@@ -40,9 +40,9 @@
                    (if (>= (count (:queue @state)) (:players-number settings))
                      (let [old-state @state 
                            new-state (assoc 
-                                       @state 
+                                       old-state 
                                        :queue 
-                                       (drop (:players-number settings) (:queue @state)))
+                                       (drop (:players-number settings) (:queue old-state)))
                            diff (difference (:queue old-state) (:queue new-state))] 
                        (if (compare-and-set! state old-state new-state)
                          (let [text (create-game diff game-states)]
