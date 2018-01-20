@@ -6,4 +6,6 @@
  :error-in-game "Player IS in a game but acts like he is NOT. Politely tell him to stop."
  :error-out-of-game "Player is NOT in a game but acts like he IS. Politely tell him to stop."
  :error "Message text is not a command. Misprint or just some trash."
+ :start-of-the-game "text for the start-of-the-game"
+ :game-over-user-trying-action "you are dead"
  }
