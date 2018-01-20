@@ -31,7 +31,7 @@
             (let [
                   game-over? (if (= action :tame) (if (> mood 100) true false) false)
                   id-game-over? (if (= action :tame) (if (<= mood 100) true false) false)
-                  new-mood (+ mood (action monster) new-mood)
+                  new-mood (+ mood (or (action monster) 0) new-mood)
                   message (str "user " id " " 
                                action " the monster, "
                                (if game-over? 
