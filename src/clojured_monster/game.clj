@@ -42,4 +42,4 @@
                   new-monster (merge monster {:mood new-mood})
                   new-ids (merge (game-state :ids) {id id-game-over?})]
         (swap! game-states #(merge % {game-state-key {:monster-chars new-monster :ids new-ids :game-over  game-over?}}))
-        message))))
+        {:game-over game-over? :text message}))))
