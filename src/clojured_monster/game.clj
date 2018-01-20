@@ -1,10 +1,6 @@
 (ns clojured-monster.game)
 
-(def texts {
-    :start-of-the-game "text for the start-of-the-game"
-    :game-over-user-trying-action "you are dead"
-    }
-  )
+(def texts (read-string (slurp "resources/english_text.clj")))
 
 (def game-states (atom {}))
 
