@@ -24,14 +24,13 @@
    (let [game-state (@game-states game-state-key)
         monster  (:monster-chars game-state)
         mood (:mood monster)
-        new-mood mood
         id-game-over? ((game-state :ids) id)]
         ; user game over
         (if id-game-over? (:game-over-user-trying-action texts)
             (let [
                   game-over? (if (= action :tame) (if (> mood 100) true false) false)
                   id-game-over? (if (= action :tame) (if (<= mood 100) true false) false)
-                  new-mood (+ mood (or (action monster) 0) new-mood)
+                  new-mood (+ mood (or (action monster) 0))
                   message (str "user " id " " 
                                action " the monster, "
                                (if game-over? 
