@@ -70,7 +70,7 @@
                  (t/send-text token id (:error-in-game texts)))
         "hit" (compute-changes-wrap id :hit)
         "scold" (compute-changes-wrap id :scold)
-        "pat" (compute-changes-wrap id :pat)
+        "pet" (compute-changes-wrap id :pat)
         "feed" (compute-changes-wrap id :feed)
         "tame" (compute-changes-wrap id :tame)
         :else (t/send-text token id (:error texts)))
