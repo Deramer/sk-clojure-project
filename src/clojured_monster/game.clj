@@ -33,11 +33,11 @@
                   id-game-over? (if (= action :tame) (if (<= mood 100) true false) false)
                   new-mood (+ mood (or (action monster) 0) new-mood)
                   message (str "user " id " " 
-                               action " the monster, "
+                               (get texts action) " the monster, "
                                (if game-over? 
-                                 " the monster becomes his/her friend"
+                                 (texts :good-ending)
                                  (if id-game-over? 
-                                   "the user was eaten" 
+                                   (texts :bad-ending) 
                                    (if (> (- new-mood mood) 0) " the monster is pleased" " the monster get angry"))))
                   new-monster (merge monster {:mood new-mood})
                   new-ids (merge (game-state :ids) {id id-game-over?})]
