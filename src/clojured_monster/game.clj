@@ -14,7 +14,8 @@
                    :hit (nth four-random-numbers 0) 
                    :pat (nth four-random-numbers 1) 
                    :feed (nth four-random-numbers 2) 
-                   :scold (nth four-random-numbers 3)  }
+                   :scold (nth four-random-numbers 3)
+                   :name (get texts (keyword (str "monster" (rand-int 7))))}
           new-ids (reduce into {} (map #(hash-map %  false) ids))
           ]
       (swap! game-states #(merge % {game-state-key {:monster-chars monster :ids new-ids :game-over false}})))
@@ -32,7 +33,7 @@
                   id-game-over? (if (= action :tame) (if (<= mood 100) true false) false)
                   new-mood (+ mood (or (action monster) 0))
                   message (str "user " id " " 
-                               (get texts action) " the monster, "
+                               (get texts action) " " (:name monster) ", "
                                (if game-over? 
                                  (get texts :good-ending)
                                  (if id-game-over? 
