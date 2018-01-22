@@ -10,7 +10,7 @@
  :game-over-user-trying-action "Здесь могла бы быть ваша реклама, но это ваш некролог. Hogwarts will miss you"
  :tame "tried to tame"
  :hit "hits"
- :pet "strokes"
+ :pat "strokes"
  :scold "scolds"
  :feed "gives a treat to"
  :good-ending "the monster becomes your new friend! It followed you until the end of the class, purring and leaning against you affectionately."
