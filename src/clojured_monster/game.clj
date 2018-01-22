@@ -21,6 +21,7 @@
       (swap! game-states #(merge % {game-state-key {:monster-chars monster :ids new-ids :game-over false}})))
       (texts :start-of-the-game))
   
+
 (defn compute-changes [id action game-state-key]
    (let [game-state (@game-states game-state-key)
         monster  (:monster-chars game-state)
@@ -32,6 +33,10 @@
                   game-over? (if (= action :tame) (if (> mood 100) true false) false)
                   id-game-over? (if (= action :tame) (if (<= mood 100) true false) false)
                   new-mood (+ mood (or (action monster) 0))
+                  new-mood (if id-game-over? (+ mood (rand-int 20)) new-mood)
+                  new-monster (merge monster {:mood new-mood})
+                  new-ids (merge (game-state :ids) {id id-game-over?})
+                  game-over-bad? (if (= action :tame) (every? boolean (vals new-ids)))
                   message (str "Student " id " " 
                                (get texts action) " the " (:name monster) ", "
                                (if game-over? 
@@ -39,7 +44,6 @@
                                  (if id-game-over? 
                                    (get texts :bad-ending) 
                                    (if (> (- new-mood mood) 0) (get texts :pleased-monster) (get texts :angry-monster)))))
-                  new-monster (merge monster {:mood new-mood})
-                  new-ids (merge (game-state :ids) {id id-game-over?})]
+                  ]
         (swap! game-states #(merge % {game-state-key {:monster-chars new-monster :ids new-ids :game-over  game-over?}}))
-        {:game-over game-over? :text message}))))
+        {:game-over (or game-over? game-over-bad?) :text message}))))
