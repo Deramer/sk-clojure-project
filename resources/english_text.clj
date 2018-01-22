@@ -17,4 +17,11 @@
  :bad-ending "the monster swallows you whole"
  :pleased-monster "the monster seems content and purrs quietly"
  :angry-monster "the monster seems angry and bellows loudly"
+ :1 "black Niffler"
+ :2 "lordly Hippogriff"
+ :3 "blazing Phoenix"
+ :4 "huge Dragon"
+ :5 "timid Bowtruckle"
+ :6 "white Griffin"
+ :7 "slow Erumpent"
  }
