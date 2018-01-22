@@ -32,8 +32,8 @@
                   game-over? (if (= action :tame) (if (> mood 100) true false) false)
                   id-game-over? (if (= action :tame) (if (<= mood 100) true false) false)
                   new-mood (+ mood (or (action monster) 0))
-                  message (str "user " id " " 
-                               (get texts action) " " (:name monster) ", "
+                  message (str "Student " id " " 
+                               (get texts action) " the " (:name monster) ", "
                                (if game-over? 
                                  (get texts :good-ending)
                                  (if id-game-over? 
