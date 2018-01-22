@@ -33,6 +33,11 @@
                (t/send-text token player (:text response)))))
     (t/send-text token id (:error-out-of-game texts))))
 
+(defn send-help [id]
+  (println "Help was requested by " id)
+  (t/send-text token id (:help texts)))
+
+
 (h/defhandler handler
 
   (h/command-fn "start"
@@ -42,8 +47,7 @@
 
   (h/command-fn "help"
     (fn [{{id :id :as chat} :chat}]
-      (println "Help was requested in " chat)
-      (t/send-text token id (:help texts))))
+      (send-help id)))
 
   (h/message-fn
     (fn [{{id :id} :chat :as message}]
@@ -73,6 +77,7 @@
         "pet" (compute-changes-wrap id :pat)
         "feed" (compute-changes-wrap id :feed)
         "tame" (compute-changes-wrap id :tame)
+        "help" (send-help id)
         :else (t/send-text token id (:error texts)))
       )))
 
