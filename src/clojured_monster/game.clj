@@ -34,10 +34,10 @@
                   message (str "user " id " " 
                                (get texts action) " the monster, "
                                (if game-over? 
-                                 (texts :good-ending)
+                                 (get texts :good-ending)
                                  (if id-game-over? 
-                                   (texts :bad-ending) 
-                                   (if (> (- new-mood mood) 0) " the monster is pleased" " the monster get angry"))))
+                                   (get texts :bad-ending) 
+                                   (if (> (- new-mood mood) 0) (get texts :pleased-monster) (get texts :angry-monster)))))
                   new-monster (merge monster {:mood new-mood})
                   new-ids (merge (game-state :ids) {id id-game-over?})]
         (swap! game-states #(merge % {game-state-key {:monster-chars new-monster :ids new-ids :game-over  game-over?}}))
