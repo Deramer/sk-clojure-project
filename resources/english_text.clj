@@ -15,4 +15,6 @@
  :feed "gives a treat to"
  :good-ending "the monster becomes your new friend!"
  :bad-ending "the monster swallows you whole"
+ :pleased-monster "the monster seems content and purrs quietly"
+ :angry-monster "the monster seems angry and bellows loudly"
  }
